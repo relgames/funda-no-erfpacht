@@ -1,5 +1,6 @@
 import org.openqa.selenium.By
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import scala.collection.JavaConversions._
 
 /**
  * @author opoleshuk
@@ -11,5 +12,8 @@ object FundParser {
     val driver = new HtmlUnitDriver
     driver.get(FUNDA_URL)
     val links = driver.findElements(By.tagName("a"))
+    for (link <- links) {
+      println(link)
+    }
   }
 }
