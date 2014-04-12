@@ -16,15 +16,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class Erfpacht {
-    private static final Logger log = LoggerFactory.getLogger(Erfpacht.class);
+public class NoErfpacht {
+    private static final Logger log = LoggerFactory.getLogger(NoErfpacht.class);
 
-    private static final String FUNDA_URL = "http://m.funda.nl/koop/amsterdam/200000-375000/85+woonopp/";
+    private static final String FUNDA_URL = "http://m.funda.nl/koop/amsterdam/200000-375000/85+woonopp/bouwperiode-1981-1990/bouwperiode-1991-2000/bouwperiode-2001-2010/bouwperiode-na-2010/";
     private static final String CACHE_FILE = "cache/cache.dat";
 
     public static void main(String[] args) throws IOException {
         RecordManager recMan = RecordManagerFactory.createRecordManager(CACHE_FILE);
         ExecutorService executorService = Executors.newFixedThreadPool(8);
+
+        System.out.println("<html><body><table>");
 
         try {
             final Map<String, String> cache = recMan.hashMap("erfpacht");
@@ -51,7 +53,10 @@ public class Erfpacht {
                                 situation = groundSituation(url);
                                 cache.put(url, situation);
                             }
-                            System.out.println(url + "," + situation);
+                            String url2 = url.replace("http://m.", "http://");
+                            if (situation.toLowerCase().contains("volle eigendom")) {
+                                System.out.println(String.format("<tr><td><a target='_blank' href='%s'>%s</a></td><td>%s</td></tr>", url2, url2, situation));
+                            }
                         }
                     }));
                 }
@@ -67,6 +72,8 @@ public class Erfpacht {
             }
             log.info("Done: processed {} url", futures.size());
             executorService.shutdown();
+
+            System.out.println("</table></body></html>");
         } finally {
             recMan.commit();
         }

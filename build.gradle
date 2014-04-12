@@ -3,7 +3,7 @@ version = '1.0'
 apply plugin: 'java'
 apply plugin: 'application'
 
-mainClassName = "org.relgames.funda.parser.Erfpacht"
+mainClassName = "org.relgames.funda.parser.NoErfpacht"
 
 repositories {
     mavenCentral()
@@ -15,7 +15,12 @@ dependencies {
     compile 'org.fusesource.jdbm:jdbm:2.0.1'
 
     compile 'org.slf4j:slf4j-api:1.7.6'
-    runtime 'ch.qos.logback:logback-classic:1.1.1'
+    compile 'ch.qos.logback:logback-classic:1.1.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest { attributes 'Main-Class': mainClassName }
 }
