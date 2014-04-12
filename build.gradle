@@ -1,8 +1,9 @@
 version = '1.0'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
-manifest.mainAttributes("Main-Class" : "org.relgames.funda.parser.Erfpacht")
+mainClassName = "org.relgames.funda.parser.Erfpacht"
 
 repositories {
     mavenCentral()
