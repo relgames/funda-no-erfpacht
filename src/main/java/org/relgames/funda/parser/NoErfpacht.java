@@ -22,7 +22,26 @@ public class NoErfpacht {
         log.info("Loaded {} elements", elements.size());
 
         for (WebElement element : elements) {
-            System.out.println(element);
+            processUrl(element.getAttribute("href"));
+            break;
         }
+    }
+
+    private static void processUrl(String url) {
+        log.info("Checking {}", url);
+        if (!url.endsWith("/")) {
+            url += "/";
+        }
+        url += "kenmerken/";
+
+        WebDriver driver = new HtmlUnitDriver();
+        driver.get(url);
+
+        List<WebElement> elements = driver.findElements(By.cssSelector("span.specs-val"));
+        for (WebElement element : elements) {
+            System.out.println(element.getText());
+        }
+
+
     }
 }
