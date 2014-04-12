@@ -12,13 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class NoErfpacht {
-    private static final Logger log = LoggerFactory.getLogger(NoErfpacht.class);
+public class Erfpacht {
+    private static final Logger log = LoggerFactory.getLogger(Erfpacht.class);
 
     private static final String FUNDA_URL = "http://m.funda.nl/koop/amsterdam/200000-375000/85+woonopp/";
     private static final String CACHE_FILE = "cache/cache.dat";
