@@ -8,7 +8,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.40.0'
+//    compile 'org.seleniumhq.selenium:selenium-htmlunit-driver:2.40.0'
+    compile 'org.jsoup:jsoup:1.7.3'
+    compile 'org.fusesource.jdbm:jdbm:2.0.1'
 
     compile 'org.slf4j:slf4j-api:1.7.6'
     runtime 'ch.qos.logback:logback-classic:1.1.1'

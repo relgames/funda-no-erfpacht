@@ -1,12 +1,12 @@
 package org.relgames.funda.parser;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 public class NoErfpacht {
@@ -14,34 +14,39 @@ public class NoErfpacht {
 
     private static final String FUNDA_URL = "http://m.funda.nl/koop/amsterdam/200000-375000/85+woonopp/";
 
-    public static void main(String[] args) {
-        WebDriver driver = new HtmlUnitDriver();
-        driver.get(FUNDA_URL);
+    public static void main(String[] args) throws IOException {
+        Document document = Jsoup.connect(FUNDA_URL).get();
 
-        List<WebElement> elements = driver.findElements(By.cssSelector("a.prop-item"));
+        List<Element> elements = document.select("a.prop-item");
         log.info("Loaded {} elements", elements.size());
 
-        for (WebElement element : elements) {
-            processUrl(element.getAttribute("href"));
-            break;
+        for (Element element : elements) {
+            String url = "http://m.funda.nl" + element.attr("href");
+            String situation = groundSituation(url);
+            System.out.println(url + "," + situation);
         }
     }
 
-    private static void processUrl(String url) {
-        log.info("Checking {}", url);
+    private static String groundSituation(String url) {
+        log.debug("Checking {}", url);
         if (!url.endsWith("/")) {
             url += "/";
         }
         url += "kenmerken/";
 
-        WebDriver driver = new HtmlUnitDriver();
-        driver.get(url);
+        try {
+            Document document = Jsoup.connect(url).get();
+            for (Element element : document.select("tr.sub-cat")) {
+                String caption = element.getElementsByTag("th").get(0).text();
+                if (caption.contains("Eigendomssituatie")) {
+                    return element.getElementsByClass("specs-val").text();
+                }
+            }
 
-        List<WebElement> elements = driver.findElements(By.cssSelector("span.specs-val"));
-        for (WebElement element : elements) {
-            System.out.println(element.getText());
+        } catch (IOException e) {
+            log.error("Can't process {}, ignoring", e);
         }
 
-
+        return null;
     }
 }
