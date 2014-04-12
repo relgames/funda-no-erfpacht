@@ -9,10 +9,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class NoErfpacht {
     private static final Logger log = LoggerFactory.getLogger(NoErfpacht.class);
@@ -26,6 +29,7 @@ public class NoErfpacht {
 
         try {
             final Map<String, String> cache = recMan.hashMap("erfpacht");
+            List<Future<?>> futures = new ArrayList<>();
 
             for (int i=1;; i++) {
                 String fundaUrl = FUNDA_URL + "p" + i;
@@ -40,7 +44,7 @@ public class NoErfpacht {
 
                 for (Element element : elements) {
                     final String url = "http://m.funda.nl" + element.attr("href");
-                    executorService.submit(new Runnable() {
+                    futures.add(executorService.submit(new Runnable() {
                         @Override
                         public void run() {
                             String situation = cache.get(url);
@@ -50,9 +54,20 @@ public class NoErfpacht {
                             }
                             System.out.println(url + "," + situation);
                         }
-                    });
+                    }));
                 }
             }
+
+            log.info("Waiting...");
+            for (Future<?> future : futures) {
+                try {
+                    future.get();
+                } catch (Exception e) {
+                    log.warn("Error, ignoring", e);
+                }
+            }
+            log.info("Done: processed {} url", futures.size());
+            executorService.shutdown();
         } finally {
             recMan.commit();
         }
