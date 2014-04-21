@@ -23,6 +23,13 @@ public class NoErfpacht {
     private static final String CACHE_FILE = "cache/cache.dat";
 
     public static void main(String[] args) throws IOException {
+        final String url;
+        if (args.length==1) {
+            url = args[0];
+        } else {
+            url = FUNDA_URL;
+        }
+
         RecordManager recMan = RecordManagerFactory.createRecordManager(CACHE_FILE);
         ExecutorService executorService = Executors.newFixedThreadPool(8);
 
@@ -33,7 +40,7 @@ public class NoErfpacht {
             List<Future<?>> futures = new ArrayList<>();
 
             for (int i=1;; i++) {
-                String fundaUrl = FUNDA_URL + "p" + i;
+                String fundaUrl = url + "p" + i;
                 log.info("Processing {}", fundaUrl);
                 Document document = Jsoup.connect(fundaUrl).get();
 
@@ -44,16 +51,16 @@ public class NoErfpacht {
                 log.debug("Loaded {} elements", elements.size());
 
                 for (Element element : elements) {
-                    final String url = "http://m.funda.nl" + element.attr("href");
+                    final String houseUrl = "http://m.funda.nl" + element.attr("href");
                     futures.add(executorService.submit(new Runnable() {
                         @Override
                         public void run() {
-                            String situation = cache.get(url);
+                            String situation = cache.get(houseUrl);
                             if (situation == null) {
-                                situation = groundSituation(url);
-                                cache.put(url, situation);
+                                situation = groundSituation(houseUrl);
+                                cache.put(houseUrl, situation);
                             }
-                            String url2 = url.replace("http://m.", "http://");
+                            String url2 = houseUrl.replace("http://m.", "http://");
                             if (situation.toLowerCase().contains("volle eigendom")) {
                                 System.out.println(String.format("<tr><td><a target='_blank' href='%s'>%s</a></td><td>%s</td></tr>", url2, url2, situation));
                             }
